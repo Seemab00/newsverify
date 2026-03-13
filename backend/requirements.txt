@@ -11,3 +11,4 @@ pymongo==4.5.0
 aiohttp==3.9.1
 newsapi-python==0.2.7
 vt-py==0.15.0
+lxml_html_clean
