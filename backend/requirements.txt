@@ -5,3 +5,4 @@ groq==0.4.2
 httpx==0.25.0
 python-dotenv==1.0.0
 pymongo==4.5.0
+vt-py==0.15.0
