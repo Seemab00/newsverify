@@ -12,7 +12,6 @@ class NewsVerifier:
         if not self.api_key:
             raise ValueError("GROQ_API_KEY not found in .env file")
         
-        # Direct initialization - no proxies parameter
         from groq import Groq
         self.client = Groq(api_key=self.api_key)
         print(f"✅ Groq API client initialized")
@@ -41,8 +40,9 @@ class NewsVerifier:
             Return ONLY valid JSON, no other text.
             """
             
+            # UPDATED: Using llama-3.3-70b-versatile model (not decommissioned)
             response = self.client.chat.completions.create(
-                model="llama3-70b-8192",  # Using Llama 3 instead of Mixtral
+                model="llama-3.3-70b-versatile",  # ✅ NEW WORKING MODEL
                 messages=[
                     {"role": "system", "content": "You are a fact-checking expert. Always return valid JSON."},
                     {"role": "user", "content": prompt}
@@ -53,7 +53,7 @@ class NewsVerifier:
             )
             
             result = json.loads(response.choices[0].message.content)
-            result["model_used"] = "llama3-70b-8192"
+            result["model_used"] = "llama-3.3-70b-versatile"
             
             print(f"✅ Analysis complete. Verdict: {result.get('verdict', 'Unknown')}")
             return result
@@ -87,7 +87,7 @@ class NewsVerifier:
             """
             
             response = self.client.chat.completions.create(
-                model="llama3-8b-8192",
+                model="llama-3.3-70b-versatile",  # ✅ Same model here
                 messages=[
                     {"role": "system", "content": "Analyze sentiment and return JSON."},
                     {"role": "user", "content": prompt}
