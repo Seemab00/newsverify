@@ -10,25 +10,30 @@ function Home() {
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setError('');
+  e.preventDefault();
+  setLoading(true);
+  setError('');
+  
+  try {
+    const response = await axios.post('https://newsverify-production.up.railway.app/api/verify', {
+      url: url,
+      check_deep: true
+    });
     
-    try {
-      const response = await axios.post('http://localhost:8000/api/verify', {
-        url: url,
-        check_deep: true
-      });
-      
-      if (response.data.report?.report_id) {
-        navigate(`/report/${response.data.report.report_id}`);
-      }
-    } catch (err) {
-      setError(err.response?.data?.message || 'Error verifying news');
-    } finally {
-      setLoading(false);
+    // ✅ YEH LINE ADD KARO - PURA RESPONSE DEKHO
+    console.log("Full response:", response.data);
+    console.log("Report ID:", response.data.report?.report_id);
+    
+    if (response.data.report?.report_id) {
+      navigate(`/report/${response.data.report.report_id}`);
     }
-  };
+  } catch (err) {
+    console.log("Error details:", err.response);
+    setError(err.response?.data?.message || 'Error verifying news');
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div className="fade-in">

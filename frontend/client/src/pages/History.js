@@ -14,7 +14,7 @@ function History() {
 
   const fetchHistory = async () => {
     try {
-      const response = await axios.get('http://localhost:8000/api/reports/recent?limit=20');
+      const response = await axios.get('https://newsverify-production.up.railway.app/api/reports/recent?limit=20');
       setReports(response.data.reports || []);
       setLoading(false);
     } catch (err) {
@@ -26,7 +26,7 @@ function History() {
   const deleteReport = async (reportId) => {
     if (window.confirm('Are you sure you want to delete this report?')) {
       try {
-        await axios.delete(`http://localhost:8000/api/reports/${reportId}`);
+        await axios.delete(`https://newsverify-production.up.railway.app/api/reports/${reportId}`);
         fetchHistory();
       } catch (err) {
         setError('Failed to delete report');

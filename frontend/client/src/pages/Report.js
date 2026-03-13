@@ -16,10 +16,10 @@ function Report() {
 
   const fetchReport = async () => {
     try {
-      const response = await axios.get(`http://localhost:8000/api/reports/${id}`);
+      const response = await axios.get(`https://newsverify-production.up.railway.app/api/reports/${id}`);
       setReport(response.data);
       
-      const shareResponse = await axios.post('http://localhost:8000/api/share', response.data);
+      const shareResponse = await axios.post('https://newsverify-production.up.railway.app/api/share', response.data);
       setShareText(shareResponse.data.shareable);
       
       setLoading(false);
