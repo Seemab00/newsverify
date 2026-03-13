@@ -1,6 +1,6 @@
 {
   "build": {
     "builder": "NIXPACKS",
-    "buildCommand": "pip install -r requirements.txt && python nltk_setup.py"
+    "buildCommand": "pip install --no-cache-dir -r requirements.txt"
   }
 }
