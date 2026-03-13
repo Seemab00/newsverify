@@ -1,5 +1,6 @@
-# main.py - Complete NewsVerify API with all 7 steps
+# main.py - Complete NewsVerify API with CORS fix
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import Optional, Dict, Any
 import uvicorn
@@ -10,6 +11,7 @@ from services.content_extractor import ContentExtractor
 from services.ai_verifier import NewsVerifier
 from services.source_verifier import SourceVerifier
 from services.report_generator import ReportGenerator
+from services.database import DatabaseService
 
 # FastAPI app initialize
 app = FastAPI(
@@ -18,12 +20,22 @@ app = FastAPI(
     version="1.0.0"
 )
 
+# ✅ CORS Middleware - IMPORTANT FOR FRONTEND
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000"],  # React frontend
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 # Initialize all services
 security_checker = SecurityChecker()
 content_extractor = ContentExtractor()
 ai_verifier = NewsVerifier()
 source_verifier = SourceVerifier()
 report_generator = ReportGenerator()
+database = DatabaseService()
 
 # Request/Response Models
 class NewsRequest(BaseModel):
@@ -53,7 +65,8 @@ async def root():
             "health": "/health",
             "verify": "/api/verify",
             "docs": "/docs",
-            "report": "/api/report/{report_id}"
+            "reports": "/api/reports/recent",
+            "stats": "/api/stats"
         }
     }
 
@@ -68,7 +81,8 @@ async def health_check():
             "content_extractor": "ready",
             "ai_verifier": "ready",
             "source_verifier": "ready",
-            "report_generator": "ready"
+            "report_generator": "ready",
+            "database": "connected" if database.is_connected() else "disconnected"
         }
     }
 
@@ -138,10 +152,22 @@ async def verify_news(request: NewsRequest):
             ai_analysis=ai_result,
             source_analysis=source_result
         )
+        
+        # STEP 6: Save to Database
+        print("📌 Step 6/6: Saving to Database...")
+        report_id = database.save_verification(final_report)
+        if report_id:
+            final_report['saved'] = True
+            final_report['report_id'] = report_id
+        else:
+            final_report['saved'] = False
+        
         print("✅ Report Generated Successfully!")
         print("="*50)
         print(f"🎯 Final Verdict: {final_report['overall_assessment']['final_verdict']}")
         print(f"📊 Trust Score: {final_report['overall_assessment']['trust_score']}%")
+        if report_id:
+            print(f"🆔 Report ID: {report_id}")
         print("="*50)
         
         return NewsResponse(
@@ -165,20 +191,47 @@ async def verify_news(request: NewsRequest):
             message=f"Error: {str(e)}"
         )
 
-# Get HTML report endpoint
-@app.get("/api/report/{report_id}")
-async def get_html_report(report_id: str):
-    """
-    Get HTML version of a report
-    (In production, fetch from database)
-    """
-    return {
-        "message": "HTML report endpoint",
-        "report_id": report_id,
-        "note": "Database integration coming in Step 8"
-    }
+# Get recent reports
+@app.get("/api/reports/recent")
+async def get_recent_reports(limit: int = 10):
+    """Get most recent verifications"""
+    reports = database.get_recent_verifications(limit)
+    return {"reports": reports, "count": len(reports)}
 
-# Get shareable text endpoint
+# Get reports by URL
+@app.get("/api/reports/url/{url}")
+async def get_reports_by_url(url: str, limit: int = 5):
+    """Get verifications for a specific URL"""
+    reports = database.get_verifications_by_url(url, limit)
+    return {"url": url, "reports": reports, "count": len(reports)}
+
+# Get specific report
+@app.get("/api/reports/{report_id}")
+async def get_report(report_id: str):
+    """Get specific report by ID"""
+    report = database.get_verification(report_id)
+    if report:
+        return report
+    else:
+        raise HTTPException(status_code=404, detail="Report not found")
+
+# Delete report
+@app.delete("/api/reports/{report_id}")
+async def delete_report(report_id: str):
+    """Delete a report by ID"""
+    deleted = database.delete_verification(report_id)
+    if deleted:
+        return {"message": "Report deleted successfully"}
+    else:
+        raise HTTPException(status_code=404, detail="Report not found")
+
+# Get database statistics
+@app.get("/api/stats")
+async def get_stats():
+    """Get database statistics"""
+    return database.get_stats()
+
+# Get shareable text
 @app.post("/api/share")
 async def get_shareable_text(report: Dict[str, Any]):
     """
@@ -199,6 +252,7 @@ async def get_shareable_text(report: Dict[str, Any]):
 async def shutdown_event():
     print("🛑 Shutting down services...")
     security_checker.close()
+    database.close()
     print("✅ All services closed")
 
 # Agar file directly run ho to server start karo
