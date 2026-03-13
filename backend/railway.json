@@ -1,6 +1,6 @@
 {
   "build": {
     "builder": "NIXPACKS",
-    "buildCommand": "pip install --no-cache-dir -r requirements.txt"
+    "buildCommand": "pip install --no-cache-dir --no-deps -r requirements.txt"
   }
 }
