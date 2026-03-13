@@ -10,4 +10,6 @@ COPY . .
 ENV PYTHONUNBUFFERED=1
 ENV PYTHONUTF8=1
 
-CMD ["gunicorn", "-w", "4", "-k", "uvicorn.workers.UvicornWorker", "main:app"]
+EXPOSE 8080
+
+CMD ["gunicorn", "-w", "4", "-k", "uvicorn.workers.UvicornWorker", "--bind", "0.0.0.0:8080", "main:app"]
