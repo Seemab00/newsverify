@@ -1,0 +1,132 @@
+.App {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Navigation */
+.navbar-brand {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+/* Cards */
+.card {
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  transition: transform 0.2s;
+  margin-bottom: 20px;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+/* Verdict badges */
+.badge-verified-true {
+  background-color: #28a745;
+  color: white;
+  padding: 5px 10px;
+  border-radius: 20px;
+}
+
+.badge-likely-true {
+  background-color: #5cb85c;
+  color: white;
+  padding: 5px 10px;
+  border-radius: 20px;
+}
+
+.badge-uncertain {
+  background-color: #ffc107;
+  color: black;
+  padding: 5px 10px;
+  border-radius: 20px;
+}
+
+.badge-likely-fake {
+  background-color: #dc3545;
+  color: white;
+  padding: 5px 10px;
+  border-radius: 20px;
+}
+
+.badge-verified-fake {
+  background-color: #721c24;
+  color: white;
+  padding: 5px 10px;
+  border-radius: 20px;
+}
+
+.badge-unsafe {
+  background-color: #343a40;
+  color: white;
+  padding: 5px 10px;
+  border-radius: 20px;
+}
+
+/* Score circle */
+.score-circle {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  font-weight: bold;
+  margin: 20px auto;
+}
+
+.score-high {
+  background-color: #d4edda;
+  color: #155724;
+  border: 3px solid #28a745;
+}
+
+.score-medium {
+  background-color: #fff3cd;
+  color: #856404;
+  border: 3px solid #ffc107;
+}
+
+.score-low {
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 3px solid #dc3545;
+}
+
+/* Loading spinner */
+.spinner-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 200px;
+}
+
+/* Animations */
+.fade-in {
+  animation: fadeIn 0.5s;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .container {
+    padding: 10px;
+  }
+  
+  h1 {
+    font-size: 1.8rem;
+  }
+}
